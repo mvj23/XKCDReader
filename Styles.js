@@ -8,11 +8,18 @@ export const header = {
     alignItems: 'center',
     justifyContent: 'space-around',
 };
+export const title = {
+    color: '#fff',
+    flex: 2,
+    flexDirection: 'row',
+    justifyContent: 'center',
+}
 export const headerText = {
     color: '#fff',
+    alignItems: 'center',
 }
 export const container = {
-    flex: 6,
+    flex: 8,
     backgroundColor: '#fff',
     alignItems: 'center',
     justifyContent: 'center',
@@ -22,4 +29,15 @@ export const navBar = {
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-around',
+    backgroundColor: '#000'
 };
+export const button = {
+    flex: 1,
+    flexDirection: 'row',
+    backgroundColor: '#333',
+    width: '20%',
+    height: '100%',
+    margin: '0.35%',
+    alignItems: 'center',
+    justifyContent: 'center',
+}

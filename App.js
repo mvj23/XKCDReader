@@ -1,14 +1,20 @@
 import { StatusBar } from 'expo-status-bar';
-import { app, header, headerText, container, navBar } from './Styles';
+import { app, header, title, headerText, container, navBar, button } from './Styles';
 import React from 'react';
-import { Text, View, Image, Button } from 'react-native';
+import { Text, View, Image, TouchableOpacity } from 'react-native';
 
 const Header = () => {
   return (
     <View style={header}>
-      <Text style={headerText}>xkcd 404</Text>
-      <Button title="Title Text"/>
-      <Button title="Search"/>
+      <View style={title}>
+        <Text style={headerText}>xkcd 404</Text>
+      </View>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Title Text</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Search</Text>
+      </TouchableOpacity>
     </View>
   )
 }
@@ -28,11 +34,21 @@ const Comic = () => {
 const NavBar = () => {
   return (
     <View style={navBar}>
-      <Button title="First"/>
-      <Button title="Previous"/>
-      <Button title="Random"/>
-      <Button title="Next"/>
-      <Button title="Latest"/>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>First</Text>
+      </TouchableOpacity>     
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Previous</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Random</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Next</Text>
+      </TouchableOpacity>
+      <TouchableOpacity style={button}> 
+        <Text style={headerText}>Latest</Text>
+      </TouchableOpacity>
     </View>
   )
 }
