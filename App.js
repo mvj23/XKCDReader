@@ -1,7 +1,8 @@
 import { StatusBar } from 'expo-status-bar';
 import { app, header, title, headerText, container, navBar, button } from './Styles';
-import React from 'react';
+import React, { Component } from 'react';
 import { Text, View, Image, TouchableOpacity } from 'react-native';
+import { WebView } from 'react-native-webview';
 
 const Header = () => {
   return (
@@ -29,6 +30,26 @@ const Comic = () => {
       <StatusBar style="auto" />
     </View>
   )
+}
+
+class MyWeb extends Component {
+  render() {
+    const jsCode = `
+      window.ReactNativeWebView.postMessage(document.getElementById('comic').innerHTML);
+      true;
+    `;
+
+    return (
+      <WebView
+        source={{ uri: 'https://xkcd.com/' }}
+        onMessage={event => {
+          alert(event.nativeEvent.data);
+        }}
+        injectedJavaScript={jsCode}
+        style={container}
+      />
+    );
+  }
 }
 
 const NavBar = () => {
