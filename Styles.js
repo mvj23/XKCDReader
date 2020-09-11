@@ -24,6 +24,11 @@ export const container = {
     alignItems: 'center',
     justifyContent: 'center',
 };
+export const picture = {
+    resizeMode: 'contain',
+    height: 300,
+    width: 300,
+}
 export const navBar = {
     flex: 1,
     flexDirection: 'row',

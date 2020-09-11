@@ -1,8 +1,7 @@
 import { StatusBar } from 'expo-status-bar';
-import { app, header, title, headerText, container, navBar, button } from './Styles';
-import React, { Component } from 'react';
-import { Text, View, Image, TouchableOpacity } from 'react-native';
-import { WebView } from 'react-native-webview';
+import { app, header, title, headerText, container, picture, navBar, button } from './Styles';
+import React, { useState, useEffect } from 'react';
+import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
 const Header = () => {
   return (
@@ -20,37 +19,48 @@ const Header = () => {
   )
 }
 
-const Comic = () => {
+const Comic = (props) => {
   return (
-    <View style={container}>
+    <ScrollView>
       <Text>Not Found</Text>
       <Image
-        source={require('./assets/not_found.png')}
+        source={{uri: props.url}}
+        style={picture}
       />
       <StatusBar style="auto" />
-    </View>
+    </ScrollView>
   )
 }
 
-class MyWeb extends Component {
-  render() {
-    const jsCode = `
-      window.ReactNativeWebView.postMessage(document.getElementById('comic').innerHTML);
-      true;
-    `;
-
-    return (
-      <WebView
-        source={{ uri: 'https://xkcd.com/' }}
-        onMessage={event => {
-          alert(event.nativeEvent.data);
-        }}
-        injectedJavaScript={jsCode}
-        style={container}
-      />
-    );
-  }
+const parseComic = (text) => {
+  //alert(text);
+  var imgText = text.substr(text.indexOf('<div id="comic">')+16, 100)
+  var split = imgText.split(" ");
+  var imgURI = "https://".concat(split[1].slice(7, -1));
+  return imgURI;
 }
+
+const NewWeb = () => {
+  const [isLoading, setLoading] = useState(true);
+  const [data, setData] = useState('');
+
+  useEffect(() => {
+    fetch('https://xkcd.com/')
+      .then((response) => response.text())
+      .then((json) => parseComic(json))
+      .then((result) => setData(result))
+      .catch((error) => console.error(error))
+      .finally(() => setLoading(false));
+  }, []);
+
+  return (
+    <View style={container}>
+      {isLoading ? <ActivityIndicator/> : (
+        <Comic url={data}/>
+      )}
+    </View>
+  );
+};
 
 const NavBar = () => {
   return (
@@ -78,7 +88,7 @@ const App = () => {
   return (
     <View style={app}>
       <Header/>
-      <Comic/>
+      <NewWeb/>
       <NavBar/>
     </View>
   );
