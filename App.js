@@ -1,6 +1,6 @@
 import { StatusBar } from 'expo-status-bar';
 import { app, header, title, headerText, container, picture, navBar, button } from './Styles';
-import React, { useState, useEffect } from 'react';
+import React, { Component, useState, useEffect } from 'react';
 import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
 const Header = () => {
@@ -40,58 +40,84 @@ const parseComic = (text) => {
   return imgURI;
 }
 
-const NewWeb = () => {
-  const [isLoading, setLoading] = useState(true);
-  const [data, setData] = useState('');
 
-  useEffect(() => {
-    fetch('https://xkcd.com/')
-      .then((response) => response.text())
-      .then((json) => parseComic(json))
-      .then((result) => setData(result))
-      .catch((error) => console.error(error))
-      .finally(() => setLoading(false));
-  }, []);
-
-  return (
-    <View style={container}>
-      {isLoading ? <ActivityIndicator/> : (
-        <Comic url={data}/>
-      )}
-    </View>
-  );
-};
-
-const NavBar = () => {
+const NavBar = (props) => {
+  const press = (num) => props.onNumChange(num);
   return (
     <View style={navBar}>
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}>
         <Text style={headerText}>First</Text>
       </TouchableOpacity>     
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}
+                        onPress={() => press(props.comicNum+1)}> 
         <Text style={headerText}>Previous</Text>
       </TouchableOpacity>
       <TouchableOpacity style={button}> 
         <Text style={headerText}>Random</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}
+                        onPress={() => press(props.comicNum-1)}> 
         <Text style={headerText}>Next</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}
+                        onPress={() => press(0)}> 
         <Text style={headerText}>Latest</Text>
       </TouchableOpacity>
     </View>
   )
 }
 
-const App = () => {
-  return (
-    <View style={app}>
-      <Header/>
-      <NewWeb/>
-      <NavBar/>
-    </View>
-  );
+class App extends Component {
+  constructor(props) {
+    super(props);
+    this.handleNumChange = this.handleNumChange.bind(this);
+
+    this.state ={
+      number: 0,
+      isLoading: true,
+      data: '',
+    }
+  }
+
+  componentDidMount() {
+    fetch('https://xkcd.com/'.concat(2358-this.state.number.toString()))
+      .then((response) => response.text())
+      .then((json) => parseComic(json))
+      .then((result) => this.setState({ data: result}))
+      .catch((error) => console.error(error))
+      .finally(() => this.setState({ isLoading: false}));
+  }
+
+  handleNumChange(n) {
+    this.state.number = n;
+    this.stateCallback();
+  }
+
+  stateCallback() {
+    fetch('https://xkcd.com/'.concat(2358-this.state.number.toString()))
+      .then((response) => response.text())
+      .then((json) => parseComic(json))
+      .then((result) => this.state.data = result)
+      .catch((error) => console.error(error))
+      .finally(() => this.setState({isLoading: false}));
+  }
+ 
+  render() {
+    const { number, isLoading, data } = this.state;
+
+    return (
+      <View style={app}>
+        <Header/>
+        <View style={container}>
+          {isLoading ? <ActivityIndicator/> : (
+            <Comic url={data}/>
+          )}
+        </View>
+        <NavBar comicNum={number}
+                onNumChange={this.handleNumChange}/>
+      </View>
+    );
+  }
 }
 
 export default App;
