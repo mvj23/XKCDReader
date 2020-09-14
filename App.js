@@ -22,7 +22,7 @@ const Header = () => {
 const Comic = (props) => {
   return (
     <ScrollView>
-      <Text>Not Found</Text>
+      <Text>{props.title}</Text>
       <Image
         source={{uri: props.url}}
         style={picture}
@@ -33,34 +33,48 @@ const Comic = (props) => {
 }
 
 const parseComic = (text) => {
-  //alert(text);
-  var imgText = text.substr(text.indexOf('<div id="comic">')+16, 100)
+  var imgText = text.substr(text.indexOf('<div id="comic">')+16, 500);
   var split = imgText.split(" ");
   var imgURI = "https://".concat(split[1].slice(7, -1));
-  return imgURI;
+
+  var titleText = imgText.split("=");
+  var tt = titleText[2].slice(1,-6);
+  var title = titleText[3].slice(0,-7);
+
+  var numText = text.substr(text.indexOf('https://xkcd.com/')+17, 4);
+
+  return {uri: imgURI,
+          titletext: tt,
+          title: title,
+          lastNum: numText};
 }
 
-
 const NavBar = (props) => {
-  const press = (num) => props.onNumChange(num);
+  const press = (num) => {
+    if(num<=props.last) {
+      props.onNumChange(num);
+    }
+  }
   return (
     <View style={navBar}>
-      <TouchableOpacity style={button}>
+      <TouchableOpacity style={button}
+                        onPress={() => press(1)}>
         <Text style={headerText}>First</Text>
       </TouchableOpacity>     
       <TouchableOpacity style={button}
-                        onPress={() => press(props.comicNum+1)}> 
+                        onPress={() => press(props.comicNum-1)}> 
         <Text style={headerText}>Previous</Text>
       </TouchableOpacity>
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}
+                        onPress={() => press(Math.floor(Math.random()*(props.last-1)+1))}> 
         <Text style={headerText}>Random</Text>
       </TouchableOpacity>
       <TouchableOpacity style={button}
-                        onPress={() => press(props.comicNum-1)}> 
+                        onPress={() => press(props.comicNum+1)}> 
         <Text style={headerText}>Next</Text>
       </TouchableOpacity>
       <TouchableOpacity style={button}
-                        onPress={() => press(0)}> 
+                        onPress={() => press(props.last)}> 
         <Text style={headerText}>Latest</Text>
       </TouchableOpacity>
     </View>
@@ -76,14 +90,21 @@ class App extends Component {
       number: 0,
       isLoading: true,
       data: '',
+      title: '',
+      latest: 0,
     }
   }
 
   componentDidMount() {
-    fetch('https://xkcd.com/'.concat(2358-this.state.number.toString()))
+    fetch('https://xkcd.com/')
       .then((response) => response.text())
       .then((json) => parseComic(json))
-      .then((result) => this.setState({ data: result}))
+      .then((result) =>{
+        this.setState({ data: result.uri,
+                        title: result.title,
+                        number: parseInt(result.lastNum),
+                        latest: parseInt(result.lastNum)});
+      })
       .catch((error) => console.error(error))
       .finally(() => this.setState({ isLoading: false}));
   }
@@ -94,26 +115,31 @@ class App extends Component {
   }
 
   stateCallback() {
-    fetch('https://xkcd.com/'.concat(2358-this.state.number.toString()))
+    fetch('https://xkcd.com/'.concat(this.state.number.toString()))
       .then((response) => response.text())
       .then((json) => parseComic(json))
-      .then((result) => this.state.data = result)
+      .then((result) => {
+        this.state.data = result.uri;
+        this.state.title = result.title;
+      })
       .catch((error) => console.error(error))
       .finally(() => this.setState({isLoading: false}));
   }
  
   render() {
-    const { number, isLoading, data } = this.state;
+    const { number, isLoading, data, title, latest } = this.state;
 
     return (
       <View style={app}>
         <Header/>
         <View style={container}>
           {isLoading ? <ActivityIndicator/> : (
-            <Comic url={data}/>
+            <Comic url={data}
+                   title={title}/>
           )}
         </View>
         <NavBar comicNum={number}
+                last={latest}
                 onNumChange={this.handleNumChange}/>
       </View>
     );

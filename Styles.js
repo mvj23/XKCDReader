@@ -26,7 +26,7 @@ export const container = {
 };
 export const picture = {
     resizeMode: 'contain',
-    height: 300,
+    height: 500,
     width: 300,
 }
 export const navBar = {
