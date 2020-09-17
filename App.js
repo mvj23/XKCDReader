@@ -3,13 +3,14 @@ import { app, header, title, headerText, container, picture, navBar, button } fr
 import React, { Component, useState, useEffect } from 'react';
 import { Text, View, Image, TouchableOpacity, ScrollView, ActivityIndicator } from 'react-native';
 
-const Header = () => {
+const Header = (props) => {
   return (
     <View style={header}>
       <View style={title}>
         <Text style={headerText}>xkcd 404</Text>
       </View>
-      <TouchableOpacity style={button}> 
+      <TouchableOpacity style={button}
+                        onPress={() => {alert(props.titleText)}}> 
         <Text style={headerText}>Title Text</Text>
       </TouchableOpacity>
       <TouchableOpacity style={button}> 
@@ -91,6 +92,7 @@ class App extends Component {
       isLoading: true,
       data: '',
       title: '',
+      titleText: '',
       latest: 0,
     }
   }
@@ -102,6 +104,7 @@ class App extends Component {
       .then((result) =>{
         this.setState({ data: result.uri,
                         title: result.title,
+                        titleText: result.titletext,
                         number: parseInt(result.lastNum),
                         latest: parseInt(result.lastNum)});
       })
@@ -121,17 +124,18 @@ class App extends Component {
       .then((result) => {
         this.state.data = result.uri;
         this.state.title = result.title;
+        this.state.titleText = result.titletext;
       })
       .catch((error) => console.error(error))
       .finally(() => this.setState({isLoading: false}));
   }
  
   render() {
-    const { number, isLoading, data, title, latest } = this.state;
+    const { number, isLoading, data, title, titleText, latest } = this.state;
 
     return (
       <View style={app}>
-        <Header/>
+        <Header titleText={titleText}/>
         <View style={container}>
           {isLoading ? <ActivityIndicator/> : (
             <Comic url={data}
